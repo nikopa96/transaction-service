@@ -1,0 +1,143 @@
+openapi: 3.1.1
+info:
+  title: TransactionService API
+  description: |-
+    List of all internal endpoints in the TransactionService
+    This documentation was generated using OpenAPI and a YAML file.
+    Based on this documentation, the backend project will automatically generate all the necessary classes.
+  version: 1.0.0
+externalDocs:
+  description: Open API specification
+  url: https://swagger.io/docs/specification/v3_0/about/
+servers:
+  - url: http://localhost:8080/
+tags:
+  - name: TransactionController
+    description: Bank transaction related endpoints
+paths:
+  /transaction/deposit:
+    post:
+      tags:
+        - TransactionController
+      summary: Depositing money into an account for a specific currency
+      description: Depositing money into an account for a specific currency
+      operationId: depositMoneyToBankAccount
+      requestBody:
+        description: |-
+          It is necessary to specify the holder of account and iban, as well as the amount of money to be deposited 
+          in a specific currency
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponseSuccess'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponseFail'
+        '422':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponseFail'
+  /transaction/debit:
+    post:
+      tags:
+        - TransactionController
+      summary: Depositing money into an account for a specific currency
+      description: Depositing money into an account for a specific currency
+      operationId: depositMoneyToBankAccount
+      requestBody:
+        description: |-
+          It is necessary to specify the holder of account and iban, as well as the amount of money to be debited in 
+          a specific currency
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponseSuccess'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponseFail'
+        '422':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponseFail'
+components:
+  schemas:
+    CurrencyCode:
+      type: string
+      enum:
+        - EUR
+        - USD
+        - SEK
+        - RUB
+    TransactionType:
+      type: string
+      enum:
+        - DEPOSIT
+        - DEBIT
+    ResponseResult:
+      type: string
+      enum:
+        - SUCCESS
+        - FAIL
+    TransactionRequest:
+      type: object
+      properties:
+        iban:
+          type: string
+          example: 'EE251298943438713614'
+        holderName:
+          type: string
+          example: 'ADAM SMITH'
+        amount:
+          type: number
+          format: double
+          example: 1234.56
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+          example: 'EUR'
+    TransactionResponseSuccess:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/TransactionType'
+        request:
+          $ref: '#/components/schemas/TransactionRequest'
+        response:
+          $ref: '#/components/schemas/ResponseResult'
+    TransactionResponseFail:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/TransactionType'
+        request:
+          $ref: '#/components/schemas/TransactionRequest'
+        response:
+          $ref: '#/components/schemas/ResponseResult'
+        responseDescription:
+          type: string
+          example: 'There is no holder with such IBAN'
