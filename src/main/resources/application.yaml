@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: transaction-service
+  datasource:
+    url: jdbc:postgresql://localhost:5433/mybankdb
+    username: devadmin
+    password: devadmin123pass
