@@ -54,9 +54,9 @@ paths:
     post:
       tags:
         - TransactionController
-      summary: Depositing money into an account for a specific currency
-      description: Depositing money into an account for a specific currency
-      operationId: depositMoneyToBankAccount
+      summary: Debiting money from an account in a single currency
+      description: Debiting money from an account in a single currency
+      operationId: debitMoneyFromBankAccount
       requestBody:
         description: |-
           It is necessary to specify the holder of account and iban, as well as the amount of money to be debited in 
