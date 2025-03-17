@@ -1,4 +1,4 @@
-openapi: 3.1.1
+openapi: 3.0.4
 info:
   title: TransactionService API
   description: |-
@@ -15,10 +15,10 @@ tags:
   - name: TransactionController
     description: Bank transaction related endpoints
 paths:
-  /transaction/deposit:
+  /transactions/deposit:
     post:
       tags:
-        - TransactionController
+        - Transaction
       summary: Depositing money into an account for a specific currency
       description: Depositing money into an account for a specific currency
       operationId: depositMoneyToBankAccount
@@ -37,23 +37,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponseSuccess'
+                $ref: '#/components/schemas/TransactionResponse'
         '400':
-          description: Invalid input
+          description: Bad request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponseFail'
+                $ref: '#/components/schemas/TransactionResponse'
         '422':
-          description: Validation exception
+          description: Unprocessable entity
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponseFail'
-  /transaction/debit:
+                $ref: '#/components/schemas/TransactionResponse'
+  /transactions/debit:
     post:
       tags:
-        - TransactionController
+        - Transaction
       summary: Debiting money from an account in a single currency
       description: Debiting money from an account in a single currency
       operationId: debitMoneyFromBankAccount
@@ -72,19 +72,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponseSuccess'
+                $ref: '#/components/schemas/TransactionResponse'
         '400':
-          description: Invalid input
+          description: Bad request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponseFail'
+                $ref: '#/components/schemas/TransactionResponse'
         '422':
-          description: Validation exception
+          description: Unprocessable entity
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponseFail'
+                $ref: '#/components/schemas/TransactionResponse'
 components:
   schemas:
     CurrencyCode:
@@ -99,11 +99,6 @@ components:
       enum:
         - DEPOSIT
         - DEBIT
-    ResponseResult:
-      type: string
-      enum:
-        - SUCCESS
-        - FAIL
     TransactionRequest:
       type: object
       properties:
@@ -119,25 +114,16 @@ components:
           example: 1234.56
         currencyCode:
           $ref: '#/components/schemas/CurrencyCode'
-          example: 'EUR'
-    TransactionResponseSuccess:
+      required:
+        - iban
+        - holderName
+        - amount
+        - currencyCode
+    TransactionResponse:
       type: object
       properties:
         type:
           $ref: '#/components/schemas/TransactionType'
-        request:
-          $ref: '#/components/schemas/TransactionRequest'
-        response:
-          $ref: '#/components/schemas/ResponseResult'
-    TransactionResponseFail:
-      type: object
-      properties:
-        type:
-          $ref: '#/components/schemas/TransactionType'
-        request:
-          $ref: '#/components/schemas/TransactionRequest'
-        response:
-          $ref: '#/components/schemas/ResponseResult'
-        responseDescription:
-          type: string
-          example: 'There is no holder with such IBAN'
+        success:
+          type: boolean
+          example: true
