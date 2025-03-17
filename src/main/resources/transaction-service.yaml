@@ -43,13 +43,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponse'
+                type: object
+                nullable: true
         '422':
           description: Unprocessable entity
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponse'
+                $ref: '#/components/schemas/FailedTransactionResponse'
   /transactions/debit:
     post:
       tags:
@@ -78,13 +79,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponse'
+                type: object
+                nullable: true
         '422':
           description: Unprocessable entity
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponse'
+                $ref: '#/components/schemas/FailedTransactionResponse'
 components:
   schemas:
     CurrencyCode:
@@ -99,26 +101,24 @@ components:
       enum:
         - DEPOSIT
         - DEBIT
+    FailedTransactionReason:
+      type: string
+      enum:
+        - NOT_ENOUGH_MONEY
+        - ACCOUNT_BALANCE_NOT_FOUND
     TransactionRequest:
       type: object
       properties:
-        iban:
+        bankAccountBalanceUuid:
           type: string
-          example: 'EE251298943438713614'
-        holderName:
-          type: string
-          example: 'ADAM SMITH'
+          format: uuid
         amount:
           type: number
           format: double
           example: 1234.56
-        currencyCode:
-          $ref: '#/components/schemas/CurrencyCode'
       required:
-        - iban
-        - holderName
+        - bankAccountBalanceUuid
         - amount
-        - currencyCode
     TransactionResponse:
       type: object
       properties:
@@ -127,3 +127,11 @@ components:
         success:
           type: boolean
           example: true
+    FailedTransactionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        failureReason:
+          $ref: '#/components/schemas/FailedTransactionReason'
