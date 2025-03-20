@@ -1,3 +1,9 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+---
 server:
   port: 8082
 spring:
@@ -5,5 +11,15 @@ spring:
     name: transaction-service
   datasource:
     url: jdbc:postgresql://localhost:5433/mybankdb
+    username: devadmin
+    password: devadmin123pass
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:postgresql://postgres:5432/mybankdb
     username: devadmin
     password: devadmin123pass
