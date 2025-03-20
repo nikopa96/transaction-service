@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class PaymentGatewayAck {
+public class NotificationAck {
 
     private String type;
     private Boolean success;

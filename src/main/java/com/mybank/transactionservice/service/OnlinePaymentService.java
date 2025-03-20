@@ -1,7 +1,7 @@
 package com.mybank.transactionservice.service;
 
 import com.mybank.transactionservice.api.model.*;
-import com.mybank.transactionservice.dto.PaymentGatewayAck;
+import com.mybank.transactionservice.dto.NotificationAck;
 import com.mybank.transactionservice.exception.OnlinePaymentException;
 import com.mybank.transactionservice.exception.TransactionException;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +19,16 @@ public class OnlinePaymentService {
     private final TransactionService transactionService;
     private final RestClient restClient;
 
+    /**
+     * This method debits money from the account and sends a notification to an external service,
+     * such as an external payment gateway of an online store.
+     * @param request debit money request with an external service callback
+     * @return successful response body
+     */
     public OnlinePaymentResponse makeOnlinePayment(OnlinePaymentRequest request) {
         try {
             var debitTransactionResponse = transactionService.debitMoneyFromBankAccount(request.getTransactionInfo());
-            sendAckToPaymentGateway(debitTransactionResponse, request.getCallbackURL());
+            sendNotificationToExternalService(debitTransactionResponse, request.getCallbackURL());
 
             return OnlinePaymentResponse.builder()
                     .type(TransactionType.DEBIT)
@@ -34,15 +40,15 @@ public class OnlinePaymentService {
                     .success(false)
                     .build();
 
-            sendAckToPaymentGateway(failedTransaction, request.getCallbackURL());
+            sendNotificationToExternalService(failedTransaction, request.getCallbackURL());
 
             throw new OnlinePaymentException("Unable to make online payment",
                     FailedOnlinePaymentReason.valueOf(e.getReason().getValue()));
         }
     }
 
-    private void sendAckToPaymentGateway(TransactionResponse transactionResponse, String callbackUrl) {
-        var ack = PaymentGatewayAck.builder()
+    private void sendNotificationToExternalService(TransactionResponse transactionResponse, String callbackUrl) {
+        var ack = NotificationAck.builder()
                 .type(transactionResponse.getType().getValue())
                 .success(transactionResponse.getSuccess())
                 .build();
@@ -55,10 +61,7 @@ public class OnlinePaymentService {
                     .retrieve()
                     .toBodilessEntity();
         } catch (HttpStatusCodeException e) {
-            log.error("Unable to send an ack to gateway payment service. Status code: {}", e.getStatusCode().value());
-
-            throw new OnlinePaymentException("Unable to send an ack to gateway payment service",
-                    FailedOnlinePaymentReason.NO_RESPONSE_FROM_PAYMENT_GATEWAY_SERVER);
+            log.error("Unable to send an ack to external payment service. Status code: {}", e.getStatusCode().value());
         }
     }
 }
